@@ -2,6 +2,15 @@
 # DiskMan - Disk Manager by SamSeen
 # macOS/Linux launcher script
 
+# Check if the script has executable permissions
+if [ ! -x "$0" ]; then
+    echo "This script doesn't have executable permissions."
+    echo "Please run: chmod +x DiskMan.sh"
+    echo "Then try again."
+    read -p "Press Enter to continue..."
+    exit 1
+fi
+
 echo "Starting DiskMan..."
 python3 DiskMan.py
 

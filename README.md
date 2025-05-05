@@ -52,13 +52,26 @@ DiskMan.bat
 
 ### macOS/Linux
 
-Run the shell script:
+First, make the shell script executable:
+
+```bash
+chmod +x DiskMan.sh
+```
+
+Then run the shell script:
 
 ```bash
 ./DiskMan.sh
 ```
 
-Or run directly with Python:
+Or make the Python script executable and run it directly:
+
+```bash
+chmod +x DiskMan.py
+./DiskMan.py
+```
+
+Alternatively, run with Python:
 
 ```bash
 python3 DiskMan.py
@@ -76,7 +89,7 @@ python3 DiskMan.py
 
 ## 🖼️ Screenshots
 
-*(Add screenshots of your application here)*
+_(Add screenshots of your application here)_
 
 ## 🔧 Customization
 
