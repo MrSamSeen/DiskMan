@@ -28,24 +28,41 @@ except ImportError:
 
 # Global variable to control the spinner
 spinner_running = False
+spinner_thread = None
 
-def show_spinner(message):
+def start_spinner(message):
+    """Start a spinner with a message."""
+    global spinner_running, spinner_thread
+    spinner_running = True
+    spinner_thread = threading.Thread(target=_show_spinner, args=(message,))
+    spinner_thread.daemon = True
+    spinner_thread.start()
+    return spinner_thread
+
+def stop_spinner():
+    """Stop the spinner."""
+    global spinner_running, spinner_thread
+    if spinner_running:
+        spinner_running = False
+        if spinner_thread and spinner_thread.is_alive():
+            spinner_thread.join(timeout=1.0)  # Add timeout to prevent hanging
+
+def _show_spinner(message):
     """Display a spinner with a message while a task is running."""
     global spinner_running
-    spinner_running = True
     spinner_chars = itertools.cycle(['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'])
-    
+
     # Clear line and show initial message
     sys.stdout.write('\r' + ' ' * 80)  # Clear line
     sys.stdout.write(f"\r{Fore.CYAN}{message} {Fore.YELLOW}")
     sys.stdout.flush()
-    
+
     while spinner_running:
         char = next(spinner_chars)
         sys.stdout.write(f"\r{Fore.CYAN}{message} {Fore.YELLOW}{char}{Style.RESET_ALL}")
         sys.stdout.flush()
         time.sleep(0.1)
-    
+
     # Clear spinner when done
     sys.stdout.write('\r' + ' ' * 80)
     sys.stdout.write(f"\r{Fore.GREEN}✓ {message} completed!{Style.RESET_ALL}\n")
@@ -55,7 +72,7 @@ def get_size(path):
     """Calculate the size of a file or directory."""
     if os.path.isfile(path):
         return os.path.getsize(path)
-    
+
     total_size = 0
     for dirpath, _, filenames in os.walk(path):
         for f in filenames:
@@ -74,17 +91,21 @@ def clear_screen():
 def is_hidden(path):
     """Check if a file or directory is hidden."""
     name = os.path.basename(path)
+
     # Unix/Mac hidden files start with a dot
     if name.startswith('.'):
         return True
+
     # Windows hidden files have the hidden attribute
     if os.name == 'nt':
         try:
             import ctypes
             attrs = ctypes.windll.kernel32.GetFileAttributesW(path)
-            return bool(attrs & 2)  # 2 is the hidden attribute
+            if attrs != -1:  # -1 is returned on error
+                return bool(attrs & 2)  # 2 is the hidden attribute
         except (AttributeError, ImportError, OSError):
             pass
+
     return False
 
 def open_file_explorer(item_path, name):
@@ -106,7 +127,7 @@ def open_file_explorer(item_path, name):
             subprocess.run(['xdg-open', parent_dir])
             print(f"\n{Fore.GREEN}Opened parent folder of {Fore.YELLOW}{name}{Fore.GREEN} in file manager{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}Note: {Fore.WHITE}You'll need to locate {Fore.YELLOW}{name}{Fore.WHITE} manually{Style.RESET_ALL}")
-        
+
         # Add a small delay to make sure the file/folder opens
         print(f"{Fore.CYAN}The file explorer should now be open.{Style.RESET_ALL}")
         return True

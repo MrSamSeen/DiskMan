@@ -3,20 +3,15 @@
 File operations for DiskMan.
 """
 import os
-import threading
-from .utils import get_size, spinner_running, show_spinner, is_hidden
+from .utils import get_size, is_hidden, start_spinner, stop_spinner
 from colorama import Fore, Style
 
 def list_directory(directory):
     """List all files and directories in the given directory with their sizes."""
-    global spinner_running
-    
     try:
-        # Start spinner in a separate thread
-        spinner_thread = threading.Thread(target=show_spinner, args=(f"Calculating sizes in {os.path.basename(directory)}...",))
-        spinner_thread.daemon = True
-        spinner_thread.start()
-        
+        # Start spinner
+        start_spinner(f"Calculating sizes in {os.path.basename(directory)}...")
+
         # Get all items in the directory
         items = []
         for item in os.listdir(directory):
@@ -29,20 +24,17 @@ def list_directory(directory):
             except (OSError, PermissionError):
                 # Skip items that can't be accessed
                 pass
-        
+
         # Sort by size (largest first)
         items.sort(key=lambda x: x[1], reverse=True)
-        
+
         # Stop spinner
-        spinner_running = False
-        spinner_thread.join()
-        
+        stop_spinner()
+
         return items
     except (OSError, PermissionError) as e:
         # Stop spinner if there's an error
-        spinner_running = False
-        if 'spinner_thread' in locals() and spinner_thread.is_alive():
-            spinner_thread.join()
-        
+        stop_spinner()
+
         print(f"{Fore.RED}Error accessing directory: {e}{Style.RESET_ALL}")
         return []
