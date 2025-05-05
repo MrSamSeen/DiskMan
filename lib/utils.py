@@ -8,6 +8,7 @@ import subprocess
 import threading
 import time
 import itertools
+import shutil
 
 # Check if required packages are installed
 try:
@@ -107,6 +108,52 @@ def is_hidden(path):
             pass
 
     return False
+
+def set_terminal_size(width, height):
+    """Set the terminal size to the specified width and height.
+
+    Args:
+        width (int): The desired width of the terminal in characters
+        height (int): The desired height of the terminal in characters
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # For Windows
+        if os.name == 'nt':
+            os.system(f'mode con: cols={width} lines={height}')
+            return True
+        # For macOS and Linux
+        else:
+            # Try using stty command
+            try:
+                subprocess.run(['stty', 'columns', str(width), 'rows', str(height)], check=False)
+                return True
+            except (subprocess.SubprocessError, FileNotFoundError):
+                pass
+
+            # Try using resize command
+            try:
+                subprocess.run(['resize', '-s', str(height), str(width)], check=False)
+                return True
+            except (subprocess.SubprocessError, FileNotFoundError):
+                pass
+
+            # Try using tput command
+            try:
+                subprocess.run(['tput', 'cols', str(width)], check=False)
+                subprocess.run(['tput', 'lines', str(height)], check=False)
+                return True
+            except (subprocess.SubprocessError, FileNotFoundError):
+                pass
+
+            # If all else fails, print a message
+            print(f"{Fore.YELLOW}Note: Unable to resize terminal to {width}x{height}. Your terminal may not support automatic resizing.{Style.RESET_ALL}")
+            return False
+    except Exception as e:
+        print(f"{Fore.RED}Error setting terminal size: {e}{Style.RESET_ALL}")
+        return False
 
 def open_file_explorer(item_path, name):
     """Open the file explorer and highlight the selected item."""

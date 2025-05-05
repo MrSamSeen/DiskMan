@@ -9,12 +9,15 @@ import sys
 from colorama import Fore, Style
 
 # Import modules from lib directory
-from lib.utils import open_file_explorer
+from lib.utils import open_file_explorer, set_terminal_size
 from lib.file_operations import list_directory, delete_item, get_item_details
 from lib.ui import display_directory, show_navigation_options, show_welcome_message, show_delete_confirmation
 
 def main():
     """Main function for DiskMan."""
+    # Set terminal size to 120x40
+    set_terminal_size(120, 40)
+
     # Show welcome message and get starting directory
     current_dir = show_welcome_message()
 
