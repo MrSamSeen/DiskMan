@@ -12,7 +12,7 @@
 - **Visual Disk Space Analysis**: Quickly identify which files and folders are taking up the most space
 - **Size-Based Sorting**: Files and folders are automatically sorted by size (largest first)
 - **Color-Coded Interface**: Different colors for directories, files, and size percentages
-- **Hidden File Detection**: Easily identify hidden files and folders with visual indicators
+- **Hidden File Support**: Includes hidden files and folders in the analysis
 - **Interactive Navigation**: Browse through your file system directly from the application
 - **File Explorer Integration**: Open files and folders in your system's file explorer
 - **Pagination**: Navigate through large directories with ease using pagination
@@ -89,7 +89,11 @@ python3 DiskMan.py
 
 ## 🖼️ Screenshots
 
-_(Add screenshots of your application here)_
+![Screenshot 1](src/Screenshot%201.png)
+
+![Screenshot 2](src/Screenshot%202.png)
+
+![Screenshot 3](src/Screenshot%203.png)
 
 ## 🔧 Customization
 
@@ -124,4 +128,4 @@ disk space analyzer, storage management, file size visualization, disk cleanup t
 
 ---
 
-Created with ❤️ by [SamSeen](https://github.com/samseen)
+Created with ❤️ by [SamSeen](https://github.com/MrSamSeen/)
