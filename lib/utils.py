@@ -122,15 +122,79 @@ def set_terminal_size(width, height):
     try:
         # For Windows
         if os.name == 'nt':
-            os.system(f'mode con: cols={width} lines={height}')
-            return True
-        # For macOS and Linux
-        else:
-            # Try using stty command
             try:
+                # Try using powershell to resize the window
+                powershell_cmd = f'powershell -command "$host.UI.RawUI.WindowSize = New-Object System.Management.Automation.Host.Size({width}, {height})"'
+                subprocess.run(powershell_cmd, shell=True, check=False)
+
+                # Also try the traditional mode command
+                os.system(f'mode con: cols={width} lines={height}')
+                return True
+            except Exception:
+                # Fallback to mode command only
+                os.system(f'mode con: cols={width} lines={height}')
+                return True
+
+        # For macOS
+        elif sys.platform == 'darwin':
+            try:
+                # Try using escape sequences first (works in iTerm2 and many modern terminals)
+                # ESC]1337;ReportColumns=width;ReportRows=height ESC\
+                sys.stdout.write(f"\033]1337;ReportColumns={width};ReportRows={height}\007")
+                sys.stdout.flush()
+
+                # Try using AppleScript to resize the Terminal window
+                # This works for Terminal.app
+                applescript_terminal = f'''
+                tell application "Terminal"
+                    if it is running then
+                        set bounds of front window to {{50, 50, {50 + width * 7}, {50 + height * 14}}}
+                    end if
+                end tell
+                '''
+                subprocess.run(['osascript', '-e', applescript_terminal], check=False)
+
+                # Try for iTerm2 as well
+                applescript_iterm = f'''
+                tell application "iTerm"
+                    if it is running then
+                        tell current window
+                            set columns to {width}
+                            set rows to {height}
+                        end tell
+                    end if
+                end tell
+                '''
+                subprocess.run(['osascript', '-e', applescript_iterm], check=False)
+
+                # Also try the traditional stty command for terminal dimensions
+                subprocess.run(['stty', 'columns', str(width), 'rows', str(height)], check=False)
+
+                # Try using ANSI escape sequence for xterm-compatible terminals
+                sys.stdout.write(f"\x1b[8;{height};{width}t")
+                sys.stdout.flush()
+
+                return True
+            except Exception:
+                # Try just the stty command
+                try:
+                    subprocess.run(['stty', 'columns', str(width), 'rows', str(height)], check=False)
+                    return True
+                except Exception:
+                    pass
+
+        # For Linux and other Unix-like systems
+        else:
+            # Try using printf with escape sequences (works in many terminals)
+            try:
+                # ESC[8;{height};{width}t sequence to resize the window
+                sys.stdout.write(f"\x1b[8;{height};{width}t")
+                sys.stdout.flush()
+
+                # Also try stty for good measure
                 subprocess.run(['stty', 'columns', str(width), 'rows', str(height)], check=False)
                 return True
-            except (subprocess.SubprocessError, FileNotFoundError):
+            except Exception:
                 pass
 
             # Try using resize command
@@ -140,19 +204,21 @@ def set_terminal_size(width, height):
             except (subprocess.SubprocessError, FileNotFoundError):
                 pass
 
-            # Try using tput command
+            # Try using xterm escape sequences
             try:
-                subprocess.run(['tput', 'cols', str(width)], check=False)
-                subprocess.run(['tput', 'lines', str(height)], check=False)
+                sys.stdout.write(f"\x1b[4;{height};{width}t")
+                sys.stdout.flush()
                 return True
-            except (subprocess.SubprocessError, FileNotFoundError):
+            except Exception:
                 pass
 
-            # If all else fails, print a message
-            print(f"{Fore.YELLOW}Note: Unable to resize terminal to {width}x{height}. Your terminal may not support automatic resizing.{Style.RESET_ALL}")
-            return False
+        # If we get here, none of the methods worked
+        # Instead of showing an error, let's just print a message to the console
+        # that will be visible when the program runs
+        print(f"{Fore.YELLOW}Note: For best experience, please resize your terminal window to at least {width}x{height} characters.{Style.RESET_ALL}")
+        return False
     except Exception as e:
-        print(f"{Fore.RED}Error setting terminal size: {e}{Style.RESET_ALL}")
+        # Don't show the error, just return False
         return False
 
 def open_file_explorer(item_path, name):

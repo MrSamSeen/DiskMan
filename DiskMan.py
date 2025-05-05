@@ -6,17 +6,26 @@ A tool to visualize and manage disk space usage.
 """
 import os
 import sys
+import time
 from colorama import Fore, Style
 
 # Import modules from lib directory
-from lib.utils import open_file_explorer, set_terminal_size
+from lib.utils import open_file_explorer, set_terminal_size, clear_screen
 from lib.file_operations import list_directory, delete_item, get_item_details
 from lib.ui import display_directory, show_navigation_options, show_welcome_message, show_delete_confirmation
 
 def main():
     """Main function for DiskMan."""
     # Set terminal size to 120x40
-    set_terminal_size(120, 40)
+    if not set_terminal_size(120, 40):
+        # If automatic resizing failed, print a message asking the user to resize manually
+        print(f"{Fore.YELLOW}For the best experience, please resize your terminal window to at least 120x40 characters.{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+        input()
+        clear_screen()
+
+    # Add a small delay to give the terminal time to resize
+    time.sleep(0.5)
 
     # Show welcome message and get starting directory
     current_dir = show_welcome_message()
