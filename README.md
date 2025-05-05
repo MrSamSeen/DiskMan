@@ -15,6 +15,7 @@
 - **Hidden File Support**: Includes hidden files and folders in the analysis
 - **Interactive Navigation**: Browse through your file system directly from the application
 - **File Explorer Integration**: Open files and folders in your system's file explorer
+- **File Management**: Delete files and folders with detailed confirmation screens
 - **Pagination**: Navigate through large directories with ease using pagination
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 
@@ -81,6 +82,7 @@ python3 DiskMan.py
 
 - **number**: Navigate to item by number (e.g., `1`, `2`, `3`)
 - **o number**: Open parent folder and highlight item (e.g., `o 1`)
+- **d number**: Delete file or folder with confirmation (e.g., `d 1`)
 - **g path**: Go to specific directory (e.g., `g /Users/Documents`)
 - **..**: Go up one level
 - **p**: Previous page (when pagination is active)

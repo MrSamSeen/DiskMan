@@ -10,18 +10,18 @@ from colorama import Fore, Style
 
 # Import modules from lib directory
 from lib.utils import open_file_explorer
-from lib.file_operations import list_directory
-from lib.ui import display_directory, show_navigation_options, show_welcome_message
+from lib.file_operations import list_directory, delete_item, get_item_details
+from lib.ui import display_directory, show_navigation_options, show_welcome_message, show_delete_confirmation
 
 def main():
     """Main function for DiskMan."""
     # Show welcome message and get starting directory
     current_dir = show_welcome_message()
-    
+
     # Initialize page number
     current_page = 0
     items_per_page = 20
-    
+
     while True:
         # Check if directory exists
         if not os.path.isdir(current_dir):
@@ -29,27 +29,27 @@ def main():
             print(f"{Fore.CYAN}Falling back to home directory...{Style.RESET_ALL}")
             current_dir = os.path.expanduser("~")  # Fallback to home directory
             current_page = 0  # Reset page when changing directory
-        
+
         # List directory contents
         items = list_directory(current_dir)
-        
+
         # Calculate total pages
         total_items = len(items)
         total_pages = (total_items + items_per_page - 1) // items_per_page
-        
+
         # Ensure current_page is valid
         current_page = max(0, min(current_page, total_pages - 1)) if total_pages > 0 else 0
-        
+
         # Display current page
         display_directory(current_dir, items, current_page, items_per_page)
-        
+
         # Show navigation options
         show_navigation_options(current_page, total_pages)
-        
+
         # Get user input
         choice = input(f"\n{Fore.CYAN}Enter your choice: {Fore.YELLOW}").strip().lower()
         print(f"{Style.RESET_ALL}", end="")  # Reset color after input
-        
+
         if choice == 'q':
             break
         elif choice == '.' or choice == '..' or choice == '...':
@@ -79,8 +79,34 @@ def main():
             if 0 <= index < total_items:
                 name, _, _, _ = items[index]
                 item_path = os.path.join(current_dir, name)
-                success = open_file_explorer(item_path, name)
+                open_file_explorer(item_path, name)
                 input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+            else:
+                print(f"\n{Fore.RED}Invalid selection.{Style.RESET_ALL}")
+                input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+        elif choice.startswith('d ') and choice[2:].strip().isdigit():
+            # Delete file or folder
+            index = int(choice[2:].strip()) - 1
+            if 0 <= index < total_items:
+                name, _, is_dir, _ = items[index]
+                item_path = os.path.join(current_dir, name)
+
+                # Get detailed information about the item
+                item_details = get_item_details(item_path)
+
+                if item_details:
+                    # Show delete confirmation screen
+                    if show_delete_confirmation(item_details):
+                        # User confirmed deletion
+                        if delete_item(item_path):
+                            print(f"\n{Fore.GREEN}Successfully deleted {Fore.WHITE}{'directory' if is_dir else 'file'}{Fore.GREEN}: {Fore.YELLOW}{name}{Style.RESET_ALL}")
+                        else:
+                            print(f"\n{Fore.RED}Failed to delete {Fore.WHITE}{'directory' if is_dir else 'file'}{Fore.RED}: {Fore.YELLOW}{name}{Style.RESET_ALL}")
+
+                        input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+                else:
+                    print(f"\n{Fore.RED}Error: Could not get details for {Fore.YELLOW}{name}{Style.RESET_ALL}")
+                    input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
             else:
                 print(f"\n{Fore.RED}Invalid selection.{Style.RESET_ALL}")
                 input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
