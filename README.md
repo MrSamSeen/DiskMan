@@ -89,11 +89,11 @@ python3 DiskMan.py
 
 ## 🖼️ Screenshots
 
-![Screenshot 1](src/Screenshot%201.png)
+![Screenshot 1](src/Screenshot%201.jpg)
 
-![Screenshot 2](src/Screenshot%202.png)
+![Screenshot 2](src/Screenshot%202.jpg)
 
-![Screenshot 3](src/Screenshot%203.png)
+![Screenshot 3](src/Screenshot%203.jpg)
 
 ## 🔧 Customization
 
