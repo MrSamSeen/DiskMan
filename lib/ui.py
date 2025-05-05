@@ -3,7 +3,6 @@
 User interface functions for DiskMan.
 """
 import os
-import sys
 import time
 import humanize
 from colorama import Fore, Style
@@ -96,6 +95,7 @@ def show_navigation_options(current_page, total_pages):
     print(f"\n{Fore.CYAN}{Style.BRIGHT}Navigation options:{Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}number{Fore.CYAN}: Navigate to item by number (1, 2, 3, ...){Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}o number{Fore.CYAN}: Open parent folder and highlight item (e.g., 'o 1'){Style.RESET_ALL}")
+    print(f"  {Fore.YELLOW}d number{Fore.CYAN}: Delete file or folder (e.g., 'd 1'){Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}g path{Fore.CYAN} : Go to specific directory (e.g., 'g /Users/Documents'){Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}..{Fore.CYAN}    : Go up one level{Style.RESET_ALL}")
     if current_page > 0:
@@ -111,6 +111,65 @@ def show_welcome_message():
 
     # Get current directory
     current_dir = os.getcwd()
+
+    # ASCII art logo for DiskMan
+    logo = [
+       
+"    ___ _     _                       ",
+"   /   (_)___| | __ /\/\   __ _ _ __  ",
+"  / /\ / / __| |/ //    \ / _` | '_ \ ",
+" / /_//| \__ \   </ /\/\ \ (_| | | | |",
+"/___,' |_|___/_|\_\/    \/\__,_|_| |_|",
+                                      
+
+        "                                ",
+        " .---.       .---.              ",
+        " |o_o |     /     \\     .--------------------.",
+        " |:_/ |    /  / \\  \\   /|                    |\\",
+        "//    \\ \\ /  / | \\  \\ / |    DISK SPACE      | \\",
+        "(|     | /  /  |  \\  \\  |     ANALYZER       |  )",
+        "/'\\_   _/  /   |   \\  \\ |    by SamSeen      | /",
+        "\\___)=(___/    |    \\__\\|____________________|/"
+    ]
+
+    # Display logo with colors
+    print("\n")
+    # First part - DiskMan text logo in cyan
+    for i in range(5):
+        print(f"{Fore.CYAN}{Style.BRIGHT}{logo[i]}{Style.RESET_ALL}")
+
+    # Second part - Disk graphic with multiple colors
+    print(f"{Fore.WHITE}{logo[5]}{Style.RESET_ALL}")  # Empty line
+    print(f"{Fore.GREEN}{Style.BRIGHT}{logo[6]}{Style.RESET_ALL}")  # Computer top
+    print(f"{Fore.GREEN}{Style.BRIGHT}{logo[7]}{Style.RESET_ALL}")  # Computer face
+    print(f"{Fore.GREEN}{Style.BRIGHT}{logo[8]}{Style.RESET_ALL}")  # Computer middle
+
+    # For the disk part, use a different color to make it stand out
+    disk_text_line = logo[9]
+    text_part1 = disk_text_line[:25]  # start
+    text_part2 = disk_text_line[25:39]  # mid
+    text_part3 = disk_text_line[39:]  # end
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text_part1}{Fore.MAGENTA}{Style.BRIGHT}{text_part2}{Fore.GREEN}{Style.BRIGHT}{text_part3}{Style.RESET_ALL}")
+
+    # For the text inside the disk, use a different color
+    disk_text_line = logo[10]
+    text_part1 = disk_text_line[:25]  # start
+    text_part2 = disk_text_line[25:39]  # mid
+    text_part3 = disk_text_line[39:]  # end
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text_part1}{Fore.MAGENTA}{Style.BRIGHT}{text_part2}{Fore.GREEN}{Style.BRIGHT}{text_part3}{Style.RESET_ALL}")
+
+    # For the analyzer text line
+    disk_text_line = logo[11]
+    text_part1 = disk_text_line[:25]  # start
+    text_part2 = disk_text_line[25:39]  # mid
+    text_part3 = disk_text_line[39:]  # end
+    print(f"{Fore.GREEN}{Style.BRIGHT}{text_part1}{Fore.MAGENTA}{Style.BRIGHT}{text_part2}{Fore.GREEN}{Style.BRIGHT}{text_part3}{Style.RESET_ALL}")
+
+    # For the SamSeen line
+    samseen_line = logo[12]
+    samseen_part1 = samseen_line[:60]  # Computer part
+    samseen_part2 = samseen_line[60:]  # "by SamSeen" part
+    print(f"{Fore.GREEN}{Style.BRIGHT}{samseen_part1}{Fore.MAGENTA}{Style.BRIGHT}{samseen_part2}{Style.RESET_ALL}")  # Computer base
 
     # Display welcome message
     print(f"\n{Fore.CYAN}{Style.BRIGHT}{'=' * 60}{Style.RESET_ALL}")
@@ -141,3 +200,113 @@ def show_welcome_message():
     else:
         # Use current directory
         return current_dir
+
+def show_delete_confirmation(item_details):
+    """Display a confirmation screen for deleting a file or folder.
+
+    Args:
+        item_details (dict): Dictionary containing item details
+
+    Returns:
+        bool: True if user confirms deletion, False otherwise
+    """
+    if not item_details:
+        print(f"{Fore.RED}Error: No item details provided.{Style.RESET_ALL}")
+        input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+        return False
+
+    # Clear screen
+    clear_screen()
+
+    # Get item information
+    original_name = item_details['name']  # Store the original name
+    path = item_details['path']
+    size = item_details['size']
+    is_dir = item_details['is_dir']
+    created = item_details['created']
+    modified = item_details['modified']
+    accessed = item_details['accessed']
+
+    # Display warning header
+    print(f"\n{Fore.RED}{Style.BRIGHT}{'!' * 80}{Style.RESET_ALL}")
+    print(f"{Fore.RED}{Style.BRIGHT}{'WARNING: PERMANENT DELETION':^80}{Style.RESET_ALL}")
+    print(f"{Fore.RED}{Style.BRIGHT}{'!' * 80}{Style.RESET_ALL}")
+
+    # Display item information
+    print(f"\n{Fore.RED}{Style.BRIGHT}You are about to delete the following {Fore.WHITE}{'DIRECTORY' if is_dir else 'FILE'}{Fore.RED}:{Style.RESET_ALL}")
+    print(f"\n{Fore.YELLOW}{Style.BRIGHT}{original_name}{Style.RESET_ALL}")
+    print(f"{Fore.BLUE}{'-' * 80}{Style.RESET_ALL}")
+
+    # Display detailed information
+    print(f"{Fore.CYAN}Path:           {Fore.WHITE}{path}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}Size:           {Fore.WHITE}{humanize.naturalsize(size)}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}Type:           {Fore.WHITE}{'Directory' if is_dir else 'File'}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}Created:        {Fore.WHITE}{created.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}Last Modified:  {Fore.WHITE}{modified.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+    print(f"{Fore.CYAN}Last Accessed:  {Fore.WHITE}{accessed.strftime('%Y-%m-%d %H:%M:%S')}{Style.RESET_ALL}")
+
+    # If it's a directory, show contents
+    if is_dir and 'contents' in item_details:
+        contents = item_details['contents']
+        item_count = item_details.get('item_count', len(contents))
+
+        print(f"\n{Fore.CYAN}Directory contains {Fore.WHITE}{item_count}{Fore.CYAN} items:{Style.RESET_ALL}")
+        print(f"{Fore.BLUE}{'-' * 80}{Style.RESET_ALL}")
+
+        for i, item in enumerate(contents):
+            if isinstance(item, str):
+                # This is the "more items not shown" message
+                print(f"{Fore.YELLOW}{item}{Style.RESET_ALL}")
+            else:
+                # This is a file/directory entry
+                name = item['name']
+                is_subdir = item['is_dir']
+                size = item['size']
+
+                # Truncate long filenames
+                if len(name) > 40:
+                    display_name = name[:37] + "..."
+                else:
+                    display_name = name
+
+                # Set colors based on item type
+                if is_subdir:
+                    name_color = Fore.CYAN + Style.BRIGHT
+                    type_str = "Directory"
+                else:
+                    name_color = Fore.WHITE + Style.BRIGHT
+                    type_str = "File"
+
+                print(f"{Fore.YELLOW}{i+1:<4} {name_color}{display_name:<40} {Fore.GREEN}{humanize.naturalsize(size):<15} {Fore.MAGENTA}{type_str}{Style.RESET_ALL}")
+
+    # Display warning message
+    print(f"\n{Fore.RED}{Style.BRIGHT}{'!' * 80}{Style.RESET_ALL}")
+    print(f"{Fore.RED}{Style.BRIGHT}WARNING: This action is {Fore.WHITE}PERMANENT{Fore.RED} and {Fore.WHITE}CANNOT BE UNDONE{Fore.RED}!{Style.RESET_ALL}")
+    print(f"{Fore.RED}{Style.BRIGHT}All data in this {'directory' if is_dir else 'file'} will be permanently lost.{Style.RESET_ALL}")
+    print(f"{Fore.RED}{Style.BRIGHT}{'!' * 80}{Style.RESET_ALL}")
+
+    # Get confirmation string (first 10 chars of original_name or all if shorter)
+    confirm_str = original_name[:10] if len(original_name) >= 10 else original_name
+
+    # Ask for confirmation
+    print(f"\n{Fore.YELLOW}To confirm deletion, type {Fore.RED}{Style.BRIGHT}\"{confirm_str}\"{Style.RESET_ALL}{Fore.YELLOW} (the first {len(confirm_str)} characters of the {'directory' if is_dir else 'file'} name):{Style.RESET_ALL}")
+    print(f"{Fore.YELLOW}(or type '{Fore.WHITE}c{Fore.YELLOW}' to abort){Style.RESET_ALL}")
+
+    # Get user input
+    user_input = input(f"{Fore.RED}> {Style.RESET_ALL}").strip()
+
+    # Check if user wants to cancel
+    if user_input.lower() == 'c':
+        print(f"\n{Fore.GREEN}Deletion cancelled.{Style.RESET_ALL}")
+        input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+        return False
+
+    # Check if confirmation matches
+    if user_input == confirm_str:
+        return True
+    else:
+        print(f"\n{Fore.RED}Confirmation failed. Deletion cancelled.{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}You entered: {Fore.WHITE}{user_input}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Expected: {Fore.WHITE}{confirm_str}{Style.RESET_ALL}")
+        input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
+        return False
