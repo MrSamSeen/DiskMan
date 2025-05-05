@@ -17,7 +17,7 @@ from lib.ui import display_directory, show_navigation_options, show_welcome_mess
 def main():
     """Main function for DiskMan."""
     # Set terminal size to 120x40
-    if not set_terminal_size(120, 40):
+    if not set_terminal_size(120, 42):
         # If automatic resizing failed, print a message asking the user to resize manually
         print(f"{Fore.YELLOW}For the best experience, please resize your terminal window to at least 120x40 characters.{Style.RESET_ALL}")
         print(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")

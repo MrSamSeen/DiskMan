@@ -31,13 +31,13 @@
 ### Option 1: Clone the Repository
 
 ```bash
-git clone https://github.com/samseen/DiskMan.git
+git clone https://github.com/mrsamseen/DiskMan.git
 cd DiskMan
 ```
 
 ### Option 2: Download ZIP
 
-1. Download the ZIP file from the [GitHub repository](https://github.com/samseen/DiskMan)
+1. Download the ZIP file from the [GitHub repository](https://github.com/mrsamseen/DiskMan)
 2. Extract the contents to a folder of your choice
 3. Open a terminal/command prompt and navigate to the extracted folder
 
