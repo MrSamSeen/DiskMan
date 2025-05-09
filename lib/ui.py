@@ -95,7 +95,7 @@ def show_navigation_options(current_page, total_pages):
     print(f"\n{Fore.CYAN}{Style.BRIGHT}Navigation options:{Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}number{Fore.CYAN}: Navigate to item by number (1, 2, 3, ...){Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}o number{Fore.CYAN}: Open parent folder and highlight item (e.g., 'o 1'){Style.RESET_ALL}")
-    print(f"  {Fore.YELLOW}d number{Fore.CYAN}: Delete file or folder (e.g., 'd 1'){Style.RESET_ALL}")
+    print(f"  {Fore.YELLOW}d number{Fore.CYAN}: Delete file or folder with smart confirmation (e.g., 'd 1'){Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}g path{Fore.CYAN} : Go to specific directory (e.g., 'g /Users/Documents'){Style.RESET_ALL}")
     print(f"  {Fore.YELLOW}..{Fore.CYAN}    : Go up one level{Style.RESET_ALL}")
     if current_page > 0:
@@ -114,13 +114,13 @@ def show_welcome_message():
 
     # ASCII art logo for DiskMan
     logo = [
-       
+
 "    ___ _     _                       ",
 "   /   (_)___| | __ /\/\   __ _ _ __  ",
 "  / /\ / / __| |/ //    \ / _` | '_ \ ",
 " / /_//| \__ \   </ /\/\ \ (_| | | | |",
 "/___,' |_|___/_|\_\/    \/\__,_|_| |_|",
-                                      
+
 
         "                                ",
         " .---.       .---.              ",
@@ -200,6 +200,19 @@ def show_welcome_message():
     else:
         # Use current directory
         return current_dir
+
+def clean_text_for_confirmation(text):
+    """Clean text for confirmation by removing special characters and converting to lowercase.
+
+    Args:
+        text (str): The text to clean
+
+    Returns:
+        str: Cleaned text (lowercase with no spaces or special characters)
+    """
+    import re
+    # Convert to lowercase and remove spaces and special characters
+    return re.sub(r'[^a-z0-9]', '', text.lower())
 
 def show_delete_confirmation(item_details):
     """Display a confirmation screen for deleting a file or folder.
@@ -285,11 +298,14 @@ def show_delete_confirmation(item_details):
     print(f"{Fore.RED}{Style.BRIGHT}All data in this {'directory' if is_dir else 'file'} will be permanently lost.{Style.RESET_ALL}")
     print(f"{Fore.RED}{Style.BRIGHT}{'!' * 80}{Style.RESET_ALL}")
 
-    # Get confirmation string (first 10 chars of original_name or all if shorter)
-    confirm_str = original_name[:10] if len(original_name) >= 10 else original_name
+    # Get raw confirmation string (first 10 chars of original_name or all if shorter)
+    raw_confirm_str = original_name[:10] if len(original_name) >= 10 else original_name
+
+    # Clean the confirmation string (lowercase, no spaces or special characters)
+    confirm_str = clean_text_for_confirmation(raw_confirm_str)
 
     # Ask for confirmation
-    print(f"\n{Fore.YELLOW}To confirm deletion, type {Fore.RED}{Style.BRIGHT}\"{confirm_str}\"{Style.RESET_ALL}{Fore.YELLOW} (the first {len(confirm_str)} characters of the {'directory' if is_dir else 'file'} name):{Style.RESET_ALL}")
+    print(f"\n{Fore.YELLOW}To confirm deletion, type {Fore.RED}{Style.BRIGHT}\"{confirm_str}\"{Style.RESET_ALL}{Fore.YELLOW} (lowercase with no spaces or special characters):{Style.RESET_ALL}")
     print(f"{Fore.YELLOW}(or type '{Fore.WHITE}c{Fore.YELLOW}' to abort){Style.RESET_ALL}")
 
     # Get user input
@@ -301,8 +317,11 @@ def show_delete_confirmation(item_details):
         input(f"{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
         return False
 
+    # Clean the user input for comparison
+    cleaned_user_input = clean_text_for_confirmation(user_input)
+
     # Check if confirmation matches
-    if user_input == confirm_str:
+    if cleaned_user_input == confirm_str:
         return True
     else:
         print(f"\n{Fore.RED}Confirmation failed. Deletion cancelled.{Style.RESET_ALL}")
